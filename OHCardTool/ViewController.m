@@ -8,12 +8,33 @@
 
 #import "ViewController.h"
 
-@implementation ViewController
+@implementation ViewController {
+    __weak IBOutlet NSTextField *domain;
+    __weak IBOutlet NSTextField *pathTextField;
+
+    __unsafe_unretained IBOutlet NSTextView *inputTextView;
+    __unsafe_unretained IBOutlet NSTextView *resultTextView;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Do any additional setup after loading the view.
+    resultTextView.automaticQuoteSubstitutionEnabled = NO;
+    resultTextView.font = [NSFont systemFontOfSize:15];
+}
+
+- (IBAction)generate:(id)sender {
+    NSString *str = inputTextView.textStorage.string;
+    NSArray *names = [str componentsSeparatedByCharactersInSet:
+                      [NSCharacterSet newlineCharacterSet]];
+    NSMutableArray *results = [NSMutableArray array];
+    for (NSString *name in names) {
+        NSString *path = [NSString stringWithFormat:@"%@%@%@", domain.stringValue, pathTextField.stringValue, name];
+        [results addObject:path];
+    }
+    NSData *data = [NSJSONSerialization dataWithJSONObject:results options:NSJSONWritingPrettyPrinted error:nil];
+    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    [resultTextView insertText:json replacementRange:NSMakeRange(0, resultTextView.string.length)];
 }
 
 
